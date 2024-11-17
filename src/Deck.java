@@ -1,31 +1,50 @@
 import java.util.ArrayList;
 
 public class Deck {
-    String[] suits = {"Черви ", "Буби ", "Пики ", "Трефы "};
-    String[] nums =  {"2 ","3 ","4 ","5 ","6 ", "7 ", "8 ", "9 ", "10 ","J " ,"Q ", "K ", "A "};
-    ArrayList<String> PlayDeck = new ArrayList<>(52);
-    public ArrayList<String> playDeck(){
-        int x = 0;
-        int cnt = 0;
-        while ((cnt< 52) && (x < 4)) {
+    private ArrayList<Card> PlayDeck;
+
+    public Deck() {
+        String[] suits = { "Hearts", "Diamonds", "Spades", "Clubs" };
+        String[] nums = { "2 ", "3 ", "4 ", "5 ", "6 ", "7 ", "8 ", "9 ", "10 ", "J ", "Q ", "K ", "A " };
+        PlayDeck = new ArrayList<>(52);
+
+        for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 13; y++) {
-                PlayDeck.add(cnt,(nums[y] + suits[x]));
-                cnt++;
+                Card c = new Card(nums[y], suits[x]);
+                PlayDeck.add(c);
             }
-            x++;
         }
-        return PlayDeck;
+        shuffle();
     }
-    public String[] suffle(ArrayList<String> Deck){
-        String[] hand = new String[2];
-        String[] CardCharacter = new String[2];
-        int x = 0;
-        while (x<2){
-            int card = (int)(Math.random()*52+1);
-            hand[x] = Deck.get(card);
-            PlayDeck.remove(Deck.indexOf(card));
-            x++;
+
+    public int getSize() {
+        return PlayDeck.size();
+    }
+
+    public void shuffle() {
+        int currentIndex = PlayDeck.size();
+
+        while (currentIndex != 0) {
+
+            int randomIndex = (int) (Math.random() * PlayDeck.size());
+            currentIndex--;
+
+            Card mem = PlayDeck.get(currentIndex);
+            PlayDeck.set(currentIndex, PlayDeck.get(randomIndex));
+            PlayDeck.set(randomIndex, mem);
         }
-        return hand;
     }
+
+    public Card[] takeCards(int count) {
+        Card[] picked = new Card[count];
+
+        for (int x = 0; x < count; x++) {
+            picked[x] = PlayDeck.get(x);
+            PlayDeck.remove(x);
+        }
+        
+        return picked;
+    }
+
+
 }

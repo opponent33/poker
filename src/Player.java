@@ -1,65 +1,99 @@
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Player {
-    int Stack;
-    int Bet = 0;
-    String[] Hand;
-    String[] SuitsOfCard;
-    String[] valueOfCard;
-    String combination = "";
-    Scanner InputBet = new Scanner(System.in);
-    public void setArrays(String[] cards){
-        for (int i = 0; i<2; i++){
-            Hand[i] = cards[i];
-            String[] cardChar = cards[i].split(" ");
-            SuitsOfCard[i] = cardChar[0];
-            valueOfCard[i] = cardChar[1];
-        }
-    }
-    public void setBeginStack(){
-        System.out.println("Введите сумму, на которую хотите сыграть.");
-        Scanner CrackSum = new Scanner(System.in);
-        Stack = CrackSum.nextInt();
-    }
-    public void StackAfrerRound(int bet, boolean GameResult){//GameResut переменная для игроков по отдельности
-        if (GameResult){Stack += Bet;}
-        else {Stack -= Bet;}
+    int stack;
+    Card[] hand = new Card[2];
+    int bet = 0;
+
+    public Player(int stack) {
+        this.stack = stack;
     }
 
-    public int rise(boolean isRise, int opponentBet){
-        int rise = 0;
-        while (rise <= opponentBet){
-            System.out.println("Введите значение ставки (больше, чем " + opponentBet + "): ");
-            System.out.println("Ставка соперника выше, вам необходимо повысить ставку");
-            rise = InputBet.nextInt();
-            Stack -= rise;
-            Bet = rise;
+    public void giveHards(Card[] cards) {
+        if (cards.length != 2) {
+            System.out.println("ТЫ ДОЛБАЕБ");
+            return;
         }
-    return rise;
+        hand = cards;
     }
-    public boolean fold(boolean inGame){
-        if (!inGame){
-            Hand[0] = null;
-            Hand[1] = null;
-            System.out.println("Вы скинули карты, вы проиграли.");
 
+    public String checkForComb(int count, Card[] cardsOnTable) {
+        // Assuming hand is already filled with two cards
+        Card[] hand = new Card[2]; // Replace with actual hand cards
+        Card[] allCards = new Card[count + 2]; // total cards = hand cards + cards on table
+        System.arraycopy(hand, 0, allCards, 0, hand.length);
+        System.arraycopy(cardsOnTable, 0, allCards, hand.length, cardsOnTable.length);
+
+        // Count occurrences of each rank and suit
+        Map<Integer, Integer> rankCount = new HashMap<>();
+        Map<Integer, Integer> suitCount = new HashMap<>();
+
+        for (Card card : allCards) {
+            rankCount.put(card.getRank(), rankCount.getOrDefault(card.getRank(), 0) + 1);
+            suitCount.put(card.getSuit(), suitCount.getOrDefault(card.getSuit(), 0) + 1);
         }
-return inGame;
+
+        boolean isFlush = suitCount.values().stream().anyMatch(count -> count >= 5);
+        boolean isStraight = isStraight(rankCount.keySet());
+
+        // Check for combinations
+        if (isFlush && isStraight) {
+            if (rankCount.containsKey(14)) { // Ace is high
+                return "royal flush";
+            }
+            return "straight flush";
+        }
+
+        int maxCount = Collections.max(rankCount.values());
+
+        if (maxCount == 4)
+            return "quads";
+        if (maxCount == 3) {
+            if (rankCount.size() == 2)
+                return "full house";
+            return "set";
+        }
+        if (maxCount == 2) {
+            if (rankCount.size() == 3)
+                return "two pairs";
+            return "pair";
+        }
+
+        if (isFlush)
+            return "flash";
+        if (isStraight)
+            return "straight";
+
+        return "high card";
     }
-    public  int call (int opponentBet, boolean isCall){
-    Bet = opponentBet;
-    Stack -= Bet;
-return opponentBet;
+
+    private boolean isStraight(Set<Integer> ranks) {
+        List<Integer> sortedRanks = new ArrayList<>(ranks);
+        Collections.sort(sortedRanks);
+        for (int i = 0; i < sortedRanks.size() - 1; i++) {
+            if (sortedRanks.get(i + 1) - sortedRanks.get(i) != 1) {
+                return false;
+            }
+        }
+        return true;
     }
-    public int blind (){
-        System.out.println("Введите количество фишек, которое хотите поставить в слепую");
-        Scanner bet = new Scanner(System.in);
-        return bet.nextInt();
+
+    public void rise(int bet) {
+        stack -= bet;
     }
-    public int allin(){
-        Bet = Stack;
-        Stack  = 0;
-        return Bet;
+
+    public void call(int opponentBet) {
+        stack -= opponentBet;
+    }
+
+    public void allin() {
+        stack = 0;
     }
 }
