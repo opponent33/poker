@@ -5,7 +5,7 @@ public class Deck {
 
     public Deck() {
         String[] suits = { "Hearts", "Diamonds", "Spades", "Clubs" };
-        String[] nums = { "2 ", "3 ", "4 ", "5 ", "6 ", "7 ", "8 ", "9 ", "10 ", "J ", "Q ", "K ", "A " };
+        int[] nums = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
         PlayDeck = new ArrayList<>(52);
 
         for (int x = 0; x < 4; x++) {
@@ -42,7 +42,7 @@ public class Deck {
             picked[x] = PlayDeck.get(x);
             PlayDeck.remove(x);
         }
-        
+
         return picked;
     }
 

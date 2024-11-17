@@ -1,11 +1,5 @@
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class Player {
     int stack;
@@ -24,65 +18,90 @@ public class Player {
         hand = cards;
     }
 
-    public String checkForComb(int count, Card[] cardsOnTable) {
+    public ArrayList<String> checkForComb(Card[] cardsOnTable) {
+        ArrayList<String> out = new ArrayList<>(10);
+
         // Assuming hand is already filled with two cards
-        Card[] hand = new Card[2]; // Replace with actual hand cards
-        Card[] allCards = new Card[count + 2]; // total cards = hand cards + cards on table
+        Card[] allCards = new Card[cardsOnTable.length + 2]; // total cards = hand cards + cards on table
         System.arraycopy(hand, 0, allCards, 0, hand.length);
         System.arraycopy(cardsOnTable, 0, allCards, hand.length, cardsOnTable.length);
 
         // Count occurrences of each rank and suit
         Map<Integer, Integer> rankCount = new HashMap<>();
-        Map<Integer, Integer> suitCount = new HashMap<>();
+        Map<String, Integer> suitCount = new HashMap<>();
 
         for (Card card : allCards) {
-            rankCount.put(card.getRank(), rankCount.getOrDefault(card.getRank(), 0) + 1);
-            suitCount.put(card.getSuit(), suitCount.getOrDefault(card.getSuit(), 0) + 1);
+            rankCount.put(card.num, rankCount.getOrDefault(card.num, 0) + 1);
+            suitCount.put(card.suit, suitCount.getOrDefault(card.suit, 0) + 1);
         }
 
-        boolean isFlush = suitCount.values().stream().anyMatch(count -> count >= 5);
+        boolean isFlush = false;
+        for (Map.Entry<Integer, Integer> entry : rankCount.entrySet()) {
+            isFlush = (entry.getValue() >= 5) || isFlush;
+        }
         boolean isStraight = isStraight(rankCount.keySet());
 
         // Check for combinations
         if (isFlush && isStraight) {
             if (rankCount.containsKey(14)) { // Ace is high
-                return "royal flush";
+                out.add("royal flush");
             }
-            return "straight flush";
+            out.add("straight flush");
         }
 
         int maxCount = Collections.max(rankCount.values());
 
         if (maxCount == 4)
-            return "quads";
+            out.add("quads");
         if (maxCount == 3) {
-            if (rankCount.size() == 2)
-                return "full house";
-            return "set";
+            if (rankCount.values().contains(3) && rankCount.values().contains(2)) {
+                out.add("full house");
+            }
+            out.add("set");
         }
         if (maxCount == 2) {
-            if (rankCount.size() == 3)
-                return "two pairs";
-            return "pair";
+            int count = 0;
+
+            for (Integer x : rankCount.values()) {
+                if (x == 2) {
+                    count++;
+                }
+            }
+
+            if (count >= 2) {
+                out.add("two pairs");
+            }
+            if (count >= 1) {
+                out.add("pair");
+            }
         }
 
         if (isFlush)
-            return "flash";
+            out.add("flash");
         if (isStraight)
-            return "straight";
+            out.add("straight");
 
-        return "high card";
+        out.add("high card");
+
+        return out;
     }
 
     private boolean isStraight(Set<Integer> ranks) {
         List<Integer> sortedRanks = new ArrayList<>(ranks);
         Collections.sort(sortedRanks);
-        for (int i = 0; i < sortedRanks.size() - 1; i++) {
-            if (sortedRanks.get(i + 1) - sortedRanks.get(i) != 1) {
-                return false;
+        for (int x = 0; x < sortedRanks.size() - 4; x++) {
+            int c = 0;
+            for (int y = 0; y < 4; y++) {
+                if (sortedRanks.get(x + y) + 1 == sortedRanks.get(x + y + 1)) {
+                    c ++;
+                }
+            }
+
+            if (c == 4) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public void rise(int bet) {
