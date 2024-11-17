@@ -1,31 +1,38 @@
 import java.util.ArrayList;
 
 public class Deck {
-    String[] suits = {"Черви ", "Буби ", "Пики ", "Трефы "};
-    String[] nums =  {"2 ","3 ","4 ","5 ","6 ", "7 ", "8 ", "9 ", "10 ","J " ,"Q ", "K ", "A "};
-    ArrayList<String> PlayDeck = new ArrayList<>(52);
-    public ArrayList<String> playDeck(){
-        int x = 0;
-        int cnt = 0;
-        while ((cnt< 52) && (x < 4)) {
+   private final ArrayList<Card> PlayDeck = new ArrayList<>(52);
+    public Deck(){
+        String[] suits = {"Черви ", "Буби ", "Пики ", "Трефы "};
+        String[] nums =  {"2 ","3 ","4 ","5 ","6 ", "7 ", "8 ", "9 ", "10 ","J " ,"Q ", "K ", "A "};
+        for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 13; y++) {
-                PlayDeck.add(cnt,(nums[y] + suits[x]));
-                cnt++;
+                Card c  = new Card(nums[y], suits[x]);
+                PlayDeck.add(c);
             }
-            x++;
+        }
+        shuffle();
+    }
+    public ArrayList<Card> takeCards(int cnt){
+        ArrayList<Card> hand = new ArrayList<>(cnt);
+        for( int x = 0; x < cnt; x++){
+            hand.add(x,PlayDeck.get(x));
+            PlayDeck.remove(x);
+        }
+        return hand;
+    }
+    public ArrayList<Card> shuffle(){
+        int currIndx = getSize();
+        while( currIndx!= 0){
+            int randomIndx = (int)(Math.random()*PlayDeck.size());
+            currIndx--;
+            Card temp = PlayDeck.get(currIndx);
+            PlayDeck.set(currIndx, PlayDeck.get(randomIndx));
+            PlayDeck.set(randomIndx, temp);
         }
         return PlayDeck;
     }
-    public String[] suffle(ArrayList<String> Deck){
-        String[] hand = new String[2];
-        String[] CardCharacter = new String[2];
-        int x = 0;
-        while (x<2){
-            int card = (int)(Math.random()*52+1);
-            hand[x] = Deck.get(card);
-            PlayDeck.remove(Deck.indexOf(card));
-            x++;
-        }
-        return hand;
+    public int getSize(){
+        return  PlayDeck.size();
     }
 }

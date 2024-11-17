@@ -5,8 +5,9 @@ import java.util.ArrayList;
 public  class Main{
     public static void main(String[] args){
         Deck d  = new Deck();
-        d.playDeck();
-        ArrayList<String> PlayDeck = d.playDeck();
-        d.suffle(PlayDeck);
+        ArrayList<Card> CardOnDesk = d.takeCards(3);
+        for (int x = 0; x < 3; x++){
+            System.out.println(CardOnDesk.get(x).getCardChar());
+        }
     }
 }
