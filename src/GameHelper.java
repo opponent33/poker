@@ -3,54 +3,72 @@ import java.lang.String;
 
 
 public class GameHelper {
-    String[] combinations = {"high card", "pair", "two pairs", "set", "straight", "flash", "full house", "quads", "straight flash", "royal flash"};
-    String PlayerComb = " ";
-    ArrayList<String> cards = new ArrayList<>();
-    int CardsInDeck  = 48;
-    int SumBet = 0;
-    ArrayList<String> SuitsOfCards = new ArrayList<>();
-    ArrayList<String> VolumeOfCards = new ArrayList<>();
-    public void cardChar (String card){
-        String[] cardsChar = new String[2];
-        cardsChar = card.split(" ");
-        SuitsOfCards.add(cardsChar[1]);
-        VolumeOfCards.add(cardsChar[2]);
-    }
-    public ArrayList<String> showFlop(ArrayList<String> Deck){
-        int x = 0;
+    ArrayList<Card> cards = new ArrayList<>();
+    int SumOfBets = 0;
+    int Bet = 0;
+    Scanner inputBet = new Scanner(System.in);
 
-        while (x < 5){
-            int index = (int)(Math.random()*CardsInDeck +1);
-            cards.add(Deck.get(index));
-            cardChar(Deck.get(index));
-            Deck.remove(index);
-            x++;
-            CardsInDeck -=1;
-        }
+    public ArrayList<Card> cardsOnDesk(Deck d) {
+        cards = d.takeCards(5);
         return cards;
     }
-    public boolean checkSuits(Player player){
-        int CntEquals = 0;
-        for ( int i = 0; i<2; i++){
-            for (String suit: SuitsOfCards){
-                if(suit.equals(player.SuitsOfCard[i])){CntEquals++;}
-            }
-        }
-        return CntEquals >= 5;
-    }
-    public int checkValue(Player player){
-        int CntEquals = 0;
-        for ( int i = 0; i < 2; i++){
-            for (String value : VolumeOfCards){
-                if (value.equals(player.valueOfCard[i])){CntEquals++;}
-            }
-        }
-        return CntEquals;
-    }
-    public boolean isStraight(Player player){
-        ArrayList<String> distrub = new ArrayList<>(7);
-        for (String cards : distrub  )
 
-        return false;
+    public void resultOfGame(Player p1, Player p2) {
+        Player winner;
+        if (p1.powOfComb() > p2.powOfComb()) {
+            winner = p1;
+        }else {
+        winner = p2;
+        winner.Stack+=Bet;
+        SumOfBets = 0;
+        }
+    }
+
+    public void inputPlayerBet() {
+        Bet = inputBet.nextInt();
+        SumOfBets += Bet;
+    }
+
+    public boolean inGame(Player p1, Player p2) {
+        return (!p1.Hand.isEmpty()) && (!p2.Hand.isEmpty());
+    }
+
+    public String checkAction(Player p1, Player p2) {
+        Scanner act = new Scanner(System.in);
+        System.out.println("Выберите действие: //n" +
+                "1: уровнять ставки //n" +
+                "2: поднять ставку //n" +
+                "3: поставить все //n " +
+                "4: скинуть карты //n");
+        String actNum = act.nextLine();
+        if (actNum.equals("1")) {
+            p1.call(p2.Bet);
+            SumOfBets += p1.Bet;
+        } else if (actNum.equals("2")) {
+            inputPlayerBet();
+            p1.rise(Bet);
+            SumOfBets += p1.Bet;
+        } else if (actNum.equals("3")) {
+            p1.allin();
+            SumOfBets += p1.Bet;
+        } else if (actNum.equals("4")) {
+            p1.fold();
+        }
+        return actNum;
+    }
+
+    public void startGame(Player p1, Player p2) {
+        while ((p1.Stack != 0) && (p2.Stack != 0)) {
+            Deck deck = new Deck();
+            cards = cardsOnDesk(deck);
+            p1.Hand = deck.takeCards(2);
+            p2.Hand = deck.takeCards(2);
+            while (inGame(p1, p2)) {
+                checkAction(p1, p2);
+                checkAction(p2, p1);
+                p1.checkComb(cards);
+                p2.checkComb(cards);
+            }
+        }
     }
 }
