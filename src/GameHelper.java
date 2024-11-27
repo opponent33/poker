@@ -1,8 +1,8 @@
 import java.util.*;
 import java.lang.String;
+//todo прописать то что когда человек делает фолд игра останавливается, победа второму, и идет все заново.
 
-
-public class GameHelper {
+public class GameHelper {//todo написать медоты на префлоп, флоп, терн и ривер или подумать нахуй они тут нужны вообще.
     ArrayList<Card> cards = new ArrayList<>();
     int SumOfBets = 0;
     int Bet = 0;
@@ -13,15 +13,38 @@ public class GameHelper {
         return cards;
     }
 
-    public void resultOfGame(Player p1, Player p2) {
-        Player winner;
+    public void resultOfGame(Player p1, Player p2) {//todo написать медот когда А игрок выиграл и когда Б игрок выиграл
+        Player winner ;
         if (p1.powOfComb() > p2.powOfComb()) {
             winner = p1;
-        }else {
-        winner = p2;
-        winner.Stack+=Bet;
-        SumOfBets = 0;
+            winner.Stack+=Bet;
+            System.out.println("В этой раздаче победу одержал игрок1 с комбинацией:" + p1.getCombination());
         }
+        if (p1.powOfComb() == p2.powOfComb()){
+            if (p1.highCard() > p2.highCard()){
+                winner = p1;
+                winner.Stack+=Bet;
+                System.out.println("В этой раздаче победу одержал игрок1 с комбинацией: "+p1.combination );
+            }else if (p2.highCard() > p1.highCard()){
+                winner = p2;
+                winner.Stack+=Bet;
+                System.out.println("В этой раздаче победу одержал игрок2 с комбинацией: "+p2.combination);
+            }
+        }
+        if (p1.powOfComb() < p2.powOfComb()){
+            winner = p2;
+            winner.Stack+=Bet;
+            System.out.println("В этой раздаче победу одержал игрок2 с комбинацией:" + p2.getCombination());
+        }
+        if (p1.Hand.isEmpty()) {
+            winner = p2;
+            winner.Stack += Bet;
+        }
+        if (p2.Hand.isEmpty()){
+            winner = p1;
+            winner.Stack += Bet;
+        }
+        SumOfBets = 0;
     }
 
     public void inputPlayerBet() {
@@ -33,42 +56,34 @@ public class GameHelper {
         return (!p1.Hand.isEmpty()) && (!p2.Hand.isEmpty());
     }
 
-    public String checkAction(Player p1, Player p2) {
+    public void checkAction(Player p1, Player p2) {
         Scanner act = new Scanner(System.in);
-        System.out.println("Выберите действие: //n" +
-                "1: уровнять ставки //n" +
-                "2: поднять ставку //n" +
-                "3: поставить все //n " +
-                "4: скинуть карты //n");
+        System.out.println("Выберите действие: " +
+                "1: уровнять ставки " +
+                "2: поднять ставку " +
+                "3: поставить все  " +
+                "4: скинуть карты ");
         String actNum = act.nextLine();
-        if (actNum.equals("1")) {
-            p1.call(p2.Bet);
-            SumOfBets += p1.Bet;
-        } else if (actNum.equals("2")) {
-            inputPlayerBet();
-            p1.rise(Bet);
-            SumOfBets += p1.Bet;
-        } else if (actNum.equals("3")) {
-            p1.allin();
-            SumOfBets += p1.Bet;
-        } else if (actNum.equals("4")) {
-            p1.fold();
+        if (!p1.Hand.isEmpty() && !p2.Hand.isEmpty()) {
+            if (actNum.equals("1")) {
+                p1.call(p2.Bet);
+                SumOfBets += p1.Bet;
+            } else if (actNum.equals("2")) {
+                inputPlayerBet();
+                p1.rise(Bet);
+                SumOfBets += p1.Bet;
+            } else if (actNum.equals("3")) {
+                p1.allin();
+                SumOfBets += p1.Bet;
+            } else if (actNum.equals("4")) {
+                p1.fold();
+            }
         }
-        return actNum;
     }
-
     public void startGame(Player p1, Player p2) {
         while ((p1.Stack != 0) && (p2.Stack != 0)) {
-            Deck deck = new Deck();
-            cards = cardsOnDesk(deck);
-            p1.Hand = deck.takeCards(2);
-            p2.Hand = deck.takeCards(2);
-            while (inGame(p1, p2)) {
-                checkAction(p1, p2);
-                checkAction(p2, p1);
-                p1.checkComb(cards);
-                p2.checkComb(cards);
-            }
+            while (inGame(p1,p2)){}
+
         }
     }
 }
