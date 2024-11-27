@@ -1,25 +1,35 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public  class Main {
     public static void main(String[] args) {
-        Deck d;
-        ArrayList<Card> table;
-        ArrayList<Card> hands;
-        Player P;
-        ArrayList<String> stockList = new ArrayList<>(0) ;
-        while (!stockList.contains("straight")) {
-            d = new Deck();
-            table = d.takeCards(5);
-            P = new Player(100, d.takeCards(2));
-            for (int y = 0; y < 5; y++) {
-                System.out.print(table.get(y).Rank + table.get(y).Suit);
+        GameHelper gameHelper = new GameHelper();
+        Deck deck = new Deck();
+        ArrayList<Card> Desk ;
+        Player player1 = new Player(1000, deck.takeCards(2));
+        Player player2 = new Player(1000, deck.takeCards(2));
+        while (player1.Stack != 0 && player2.Stack !=0) {
+            Desk = deck.takeCards(5);
+            gameHelper.checkAction(player1, player2);
+            gameHelper.checkAction(player2, player1);
+            if ((!player2.allin()) || (!player1.allin())) {
+                gameHelper.flop(player1, player2, Desk);
+                gameHelper.turn(player1, player2, Desk);
+                gameHelper.river(player1, player2, Desk);
+            }else {
+                for (Card c : Desk){System.out.println(c.CardChar);}
+                player1.checkComb(Desk);
+                player2.checkComb(Desk);
             }
-            System.out.print(P.Hand.get(0).Rank + P.Hand.get(0).Suit);
-            System.out.print(P.Hand.get(1).Rank + P.Hand.get(1).Suit);
-            stockList.add(P.checkComb(table));
+            player1.checkComb(Desk);
+            player2.checkComb(Desk);
+            gameHelper.resultOfGame(player1, player2);
+            deck = new Deck();
+            player1.Hand = deck.takeCards(2);
+            player2.Hand = deck.takeCards(2);
         }
     }
 }
