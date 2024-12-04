@@ -1,8 +1,6 @@
 import java.util.*;
 import java.lang.String;
-//todo прописать то что когда человек делает фолд игра останавливается, победа второму, и идет все заново.
-//todo если типок аллынит то вскрыть все 5 карт сразу
-//todo
+
 public class GameHelper {
     int SumOfBets = 0;
     int Bet = 0;

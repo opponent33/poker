@@ -33,28 +33,7 @@ public class Player {
         Hand.clear();
         inGame = false;
     }
-    public boolean wantContinue() {
-        Scanner scanner = new Scanner(System.in);
-        int inGame;
-        do {
-            System.out.println("Хотите продолжить игру?"
-                    + "Чтобы продолжить введите: 1"
-                    + "Чтобы остановиться введите: 0");
-            while (!scanner.hasNextInt()) { // Проверка на корректность ввода
-                System.out.println("Некорректный ввод. Пожалуйста, введите 0 или 1.");
-                scanner.next(); // Удаление некорректного ввода из буфера
-            }
-            inGame = scanner.nextInt();
-            if (inGame != 0 && inGame != 1) {
-                System.out.println("Вы ввели не корректное значение. Попробуйте еще раз.");
-            }
 
-        } while (inGame != 0 && inGame != 1);
-
-
-        scanner.close(); //Закрываем Scanner после использования
-        return inGame == 1;
-    }
     public int powOfComb(){
         String[] combinations = {"high card", "pair", "two pairs", "set", "straight", "flash", "full house", "quads", "straight flash", "royal flash"};
         ArrayList<String> combination = new ArrayList<>(List.of(combinations));
